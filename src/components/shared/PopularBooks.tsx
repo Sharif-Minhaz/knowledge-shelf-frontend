@@ -1,16 +1,20 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { books } from "@/consts";
 import Link from "next/link";
+import { getAllBooks } from "@/lib/actions/book.actions";
+import { TBook } from "../../../types";
 
-export default function PopularBooks() {
+export default async function PopularBooks() {
+	const booksInfo = await getAllBooks();
+	const favBooks = booksInfo.books?.slice(0, 4);
+
 	return (
 		<section className="py-12 bg-gray-50">
 			<div className="container mx-auto px-4">
 				<h2 className="text-3xl font-bold text-center mb-8 text-gray-800">Popular Books</h2>
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-					{books.map((book) => (
+					{favBooks.map((book: TBook) => (
 						<Card
 							key={book._id}
 							className="overflow-hidden transition-shadow duration-300 hover:shadow-lg"

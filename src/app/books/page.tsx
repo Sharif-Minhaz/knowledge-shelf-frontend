@@ -1,18 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { books } from "@/consts";
+import { getAllBooks } from "@/lib/actions/book.actions";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { TBook } from "../../../types";
 
-export default function Books() {
+export default async function Books() {
+	const booksInfo = await getAllBooks();
+
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 relative">
-			{books.map((book) => (
+			{booksInfo.books?.map((book: TBook) => (
 				<Card
 					key={book._id}
-					className="overflow-hidden transition-shadow duration-300 hover:shadow-lg"
+					className="overflow-hidden relative transition-shadow duration-300 hover:shadow-lg"
 				>
+					<div className="absolute top-0 right-3">
+						<span className="border inline-block p-2 rounded-md">delete</span>
+					</div>
 					<CardHeader className="p-0">
 						<Link href={`/books/${book._id}`}>
 							<Image
