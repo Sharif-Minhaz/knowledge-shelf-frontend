@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { TBook } from "../../../types";
+import DeleteBookButton from "@/components/shared/DeleteBookButton";
 
 export default async function Books() {
 	const booksInfo = await getAllBooks();
@@ -16,9 +17,7 @@ export default async function Books() {
 					key={book._id}
 					className="overflow-hidden relative transition-shadow duration-300 hover:shadow-lg"
 				>
-					<div className="absolute top-0 right-3">
-						<span className="border inline-block p-2 rounded-md">delete</span>
-					</div>
+					<DeleteBookButton bookId={book._id} />
 					<CardHeader className="p-0">
 						<Link href={`/books/${book._id}`}>
 							<Image

@@ -40,9 +40,27 @@ export const addBook = async (bookData: FormData) => {
 
 		const bookInfo = await res.json();
 
-		revalidatePath("/book");
+		revalidatePath("/books");
 		return convertToPlainObject(bookInfo);
-	} catch (error: unknown) {
+	} catch (error) {
+		handleError(error, 500);
+	}
+};
+
+export const deleteBook = async (bookId: string) => {
+	try {
+		const res = await fetch(`${secret.baseUrl}/book/${bookId}`, {
+			method: "DELETE",
+		});
+		if (!res.ok) {
+			handleError(`Failed to delete the book: ${res.status} ${res.statusText}`);
+		}
+
+		const deletedBookInfo = await res.json();
+		revalidatePath("/books");
+
+		return convertToPlainObject(deletedBookInfo);
+	} catch (error) {
 		handleError(error, 500);
 	}
 };

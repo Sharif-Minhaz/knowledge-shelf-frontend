@@ -13,7 +13,6 @@ import {
 import {
 	NavigationMenu,
 	NavigationMenuItem,
-	NavigationMenuLink,
 	NavigationMenuList,
 	navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
@@ -32,19 +31,15 @@ export default function Navbar() {
 					<NavigationMenu className="!ml-6">
 						<NavigationMenuList>
 							<NavigationMenuItem>
-								<Link href="/" legacyBehavior passHref>
-									<NavigationMenuLink className={navigationMenuTriggerStyle()}>
-										<Home className="mr-2 h-4 w-4" />
-										Home
-									</NavigationMenuLink>
+								<Link href="/" className={navigationMenuTriggerStyle()}>
+									<Home className="mr-2 h-4 w-4" />
+									Home
 								</Link>
 							</NavigationMenuItem>
 							<NavigationMenuItem className="!ml-3">
-								<Link href="/books" legacyBehavior passHref>
-									<NavigationMenuLink className={navigationMenuTriggerStyle()}>
-										<Book className="mr-2 h-4 w-4" />
-										Books
-									</NavigationMenuLink>
+								<Link href="/books" className={navigationMenuTriggerStyle()}>
+									<Book className="mr-2 h-4 w-4" />
+									Books
 								</Link>
 							</NavigationMenuItem>
 						</NavigationMenuList>
