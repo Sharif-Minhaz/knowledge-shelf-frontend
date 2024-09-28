@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 
 export const getAllBooks = async () => {
 	try {
-		const res = await fetch(`${secret.baseUrl}/book`, { cache: "no-store" });
+		const res = await fetch(`${secret.baseUrl}/book`);
 		const booksInfo = await res.json();
 
 		return convertToPlainObject(booksInfo);

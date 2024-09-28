@@ -1,5 +1,5 @@
 import CheckoutForm from "@/components/shared/CheckoutForm";
-import { TBook } from "../../../../types";
+import { TBook } from "../../../../../types";
 import { secret } from "@/config";
 import { getSingleBook } from "@/lib/actions/book.actions";
 import PopularBooks from "@/components/shared/PopularBooks";

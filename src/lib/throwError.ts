@@ -12,7 +12,7 @@ const throwError = (message: string, status: number) => {
 export const handleError = (error: unknown, status: number = 500) => {
 	console.error(error);
 	if (error instanceof Error) {
-		throwError(error.message, status);
+		throwError(`${error.message}, Try again`, status);
 	} else {
 		throwError("Internal server error", 500);
 	}

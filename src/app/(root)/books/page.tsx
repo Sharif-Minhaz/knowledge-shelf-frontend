@@ -4,7 +4,7 @@ import { getAllBooks } from "@/lib/actions/book.actions";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { TBook } from "../../../types";
+import { TBook } from "../../../../types";
 import DeleteBookButton from "@/components/shared/DeleteBookButton";
 
 export default async function Books() {
