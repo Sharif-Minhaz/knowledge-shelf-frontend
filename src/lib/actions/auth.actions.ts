@@ -7,8 +7,9 @@ import { convertToPlainObject } from "../utils";
 import { secret } from "@/config";
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
+import { redirect } from "next/navigation";
 
-export const currentUser = () => {
+export const currentUser = async () => {
 	const cookieStore = cookies();
 	const accessToken = cookieStore.get("accessToken");
 
@@ -88,8 +89,19 @@ export const refreshToken = async () => {
 };
 
 export const getProfile = async () => {
-	try {
-	} catch (error: unknown) {
-		handleError(error, 500);
-	}
+	const cookieStore = cookies();
+	const accessToken = cookieStore.get("accessToken");
+
+	if (!accessToken?.value) return redirect("/login");
+
+	const res = await fetch(`${secret.baseUrl}/profile`, {
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${accessToken.value}`,
+			"Content-Type": "application/json",
+		},
+	});
+	const bookInfo = await res.json();
+
+	return convertToPlainObject(bookInfo);
 };

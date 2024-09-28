@@ -58,7 +58,7 @@ export default function LoginForm() {
 					},
 				});
 				form.reset();
-				return router.back();
+				return router.replace("/");
 			} else {
 				console.error(userInfo);
 				toast.error(userInfo.message);

@@ -4,11 +4,12 @@ import { getAllBooks } from "@/lib/actions/book.actions";
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { TBook } from "../../../../types";
+import { TBook, TUser } from "../../../../types";
 import DeleteBookButton from "@/components/shared/DeleteBookButton";
+import { currentUser } from "@/lib/actions/auth.actions";
 
 export default async function Books() {
-	const booksInfo = await getAllBooks();
+	const [booksInfo, userInfo] = await Promise.all([getAllBooks(), currentUser()]);
 
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 relative">
@@ -17,7 +18,10 @@ export default async function Books() {
 					key={book._id}
 					className="overflow-hidden relative transition-shadow duration-300 hover:shadow-lg"
 				>
-					<DeleteBookButton bookId={book._id} />
+					{(userInfo as TUser)?.role === "admin" && (
+						<DeleteBookButton bookId={book._id} />
+					)}
+
 					<CardHeader className="p-0">
 						<Link href={`/books/${book._id}`}>
 							<Image
@@ -43,11 +47,13 @@ export default async function Books() {
 					</CardFooter>
 				</Card>
 			))}
-			<Link href="/books/add">
-				<div className="w-[60px] h-[60px] bg-blue-500 flex items-center justify-center text-white rounded-full fixed bottom-4 right-4">
-					<Plus />
-				</div>
-			</Link>
+			{(userInfo as TUser)?.role === "admin" && (
+				<Link href="/books/add">
+					<div className="w-[60px] h-[60px] bg-blue-500 flex items-center justify-center text-white rounded-full fixed bottom-4 right-4">
+						<Plus />
+					</div>
+				</Link>
+			)}
 		</div>
 	);
 }
