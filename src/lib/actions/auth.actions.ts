@@ -11,11 +11,41 @@ import { redirect } from "next/navigation";
 
 export const currentUser = async () => {
 	const cookieStore = cookies();
-	const accessToken = cookieStore.get("accessToken");
+	const accessTokenCookie = cookieStore.get("accessToken");
+	const refreshTokenCookie = cookieStore.get("refreshToken");
 
-	if (!accessToken?.value) return null;
+	let accessTokenValue: string = accessTokenCookie?.value as string;
 
-	const decoded = jwtDecode(accessToken?.value);
+	if (!accessTokenCookie?.value && !refreshTokenCookie?.value) return null;
+
+	if (refreshTokenCookie?.value && !accessTokenCookie?.value) {
+		console.log(
+			"===================== Cookies should save on the browser as it's in the try-catch block"
+		);
+		try {
+			const host = secret.publicUrl;
+			const res = await fetch(`${host}/api/refresh-token`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify(refreshTokenCookie?.value),
+			});
+			console.log(res);
+			const tokensInfo = await res.json();
+			console.log("Api response: ", tokensInfo);
+			accessTokenValue = tokensInfo.accessToken;
+		} catch (error) {
+			console.log("<--------------------Error occurred: ", error);
+		}
+	}
+
+	if (!accessTokenValue) throw Error("Can't set the tokens in cookies");
+
+	console.log("Access token value", accessTokenValue);
+
+	const decoded = jwtDecode(accessTokenValue);
 
 	return decoded;
 };
@@ -29,37 +59,25 @@ export const logout = async () => {
 };
 
 export const login = async (data: TLoginParams) => {
-	try {
-		const cookieStore = cookies();
+	const res = await fetch(`${secret.baseUrl}/auth/login`, {
+		method: "POST",
+		body: JSON.stringify(data),
+		headers: {
+			"content-type": "application/json",
+		},
+	});
 
-		const res = await fetch(`${secret.baseUrl}/auth/login`, {
-			method: "POST",
-			body: JSON.stringify(data),
-			headers: {
-				"content-type": "application/json",
-			},
+	const userInfo = await res.json();
+
+	if (userInfo.success) {
+		await setAuthCookies({
+			accessToken: userInfo.accessToken,
+			refreshToken: userInfo.refreshToken,
 		});
-
-		const userInfo = await res.json();
-
-		if (userInfo.success) {
-			cookieStore.set("accessToken", userInfo.accessToken, {
-				httpOnly: true,
-				path: "/",
-				expires: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
-			});
-			cookieStore.set("refreshToken", userInfo.refreshToken, {
-				httpOnly: true,
-				path: "/",
-				expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-			});
-			revalidatePath("/");
-		}
-
-		return convertToPlainObject(userInfo);
-	} catch (error: unknown) {
-		handleError(error, 500);
+		revalidatePath("/");
 	}
+
+	return convertToPlainObject(userInfo);
 };
 
 export const register = async (data: TRegistrationParams) => {
@@ -81,11 +99,22 @@ export const register = async (data: TRegistrationParams) => {
 	}
 };
 
-export const refreshToken = async () => {
-	try {
-	} catch (error: unknown) {
-		handleError(error, 500);
-	}
+export const refreshTokenFunc = async (value: string) => {
+	const res = await fetch(`${secret.baseUrl}/auth/refresh-token`, {
+		method: "POST",
+		body: JSON.stringify({ refreshToken: value }),
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+
+	const tokens = await res.json();
+	setAuthCookies({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
+
+	return {
+		refreshToken: tokens.refreshToken as string,
+		accessToken: tokens.accessToken as string,
+	};
 };
 
 export const getProfile = async () => {
@@ -104,4 +133,26 @@ export const getProfile = async () => {
 	const bookInfo = await res.json();
 
 	return convertToPlainObject(bookInfo);
+};
+
+export const setAuthCookies = async ({
+	accessToken,
+	refreshToken,
+}: {
+	accessToken: string;
+	refreshToken: string;
+}) => {
+	const cookieStore = cookies();
+	cookieStore.set("accessToken", accessToken, {
+		httpOnly: true,
+		path: "/",
+		expires: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
+		sameSite: "lax",
+	});
+	cookieStore.set("refreshToken", refreshToken, {
+		httpOnly: true,
+		path: "/",
+		expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+		sameSite: "lax",
+	});
 };

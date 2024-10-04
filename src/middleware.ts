@@ -6,6 +6,7 @@ import { TUser } from "../types";
 
 export async function middleware(request: NextRequest) {
 	const { nextUrl } = request;
+
 	const user = await currentUser();
 
 	const isAuthenticated = !!user;
