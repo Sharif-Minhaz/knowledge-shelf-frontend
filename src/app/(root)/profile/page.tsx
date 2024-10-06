@@ -10,134 +10,13 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
-import { IProfileData } from "../../../../types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getProfile } from "@/lib/actions/auth.actions";
+import { IOrderHistory } from "../../../../types";
+import Link from "next/link";
 
-const profileData: IProfileData = {
-	success: true,
-	user: {
-		_id: "667ece1a18bd6b6fdff97eb3",
-		fullName: "rabby islam",
-		email: "rabby@gmail.com",
-		avatar: "https://randomuser.me/api/portraits/men/7.jpg",
-		role: "user",
-	},
-	history: [
-		{
-			_id: "697ece1a18bd6b6fdff97e99",
-			bookId: {
-				_id: "667ece1a18bd6b6fdff97ebd",
-				name: "compiler design",
-				price: 1232,
-				authorName: "John von nueman",
-				stock: 21,
-				description: "Hello world",
-				image: "https://res.cloudinary.com/doj7bhnz8/image/upload/v1727268575/Knowledge_Shelf/wzyd8lvaigqwekfhit1i.png",
-				imagekey: "sdfsfs/dskfsl",
-				publishedDate: "2024-06-28T14:52:10.765+00:00",
-				createdAt: "2024-06-28T14:52:10.765+00:00",
-				addedBy: "667ece1a18bd6b6fdff97ebd",
-			},
-			orderName: "Mahin",
-			quantity: 2,
-			total: 12,
-			phoneNumber: "013932874378",
-			address: "savar",
-			tranxId: "ksfjksekjsdfjkjfksljf",
-		},
-		{
-			_id: "697ece1a18bd6b6fdff97e99",
-			bookId: {
-				_id: "667ece1a18bd6b6fdff97ebd",
-				name: "compiler design",
-				price: 1232,
-				authorName: "John von nueman",
-				stock: 21,
-				description: "Hello world",
-				image: "https://res.cloudinary.com/doj7bhnz8/image/upload/v1727268575/Knowledge_Shelf/wzyd8lvaigqwekfhit1i.png",
-				imagekey: "sdfsfs/dskfsl",
-				publishedDate: "2024-06-28T14:52:10.765+00:00",
-				createdAt: "2024-06-28T14:52:10.765+00:00",
-				addedBy: "667ece1a18bd6b6fdff97ebd",
-			},
-			orderName: "Mahin",
-			quantity: 2,
-			total: 12,
-			phoneNumber: "013932874378",
-			address: "savar",
-			tranxId: "ksfjksekjsdfjkjfksljf",
-		},
-		{
-			_id: "697ece1a18bd6b6fdff97e99",
-			bookId: {
-				_id: "667ece1a18bd6b6fdff97ebd",
-				name: "compiler design",
-				price: 1232,
-				authorName: "John von nueman",
-				stock: 21,
-				description: "Hello world",
-				image: "https://res.cloudinary.com/doj7bhnz8/image/upload/v1727268575/Knowledge_Shelf/wzyd8lvaigqwekfhit1i.png",
-				imagekey: "sdfsfs/dskfsl",
-				publishedDate: "2024-06-28T14:52:10.765+00:00",
-				createdAt: "2024-06-28T14:52:10.765+00:00",
-				addedBy: "667ece1a18bd6b6fdff97ebd",
-			},
-			orderName: "Mahin",
-			quantity: 2,
-			total: 12,
-			phoneNumber: "013932874378",
-			address: "savar",
-			tranxId: "ksfjksekjsdfjkjfksljf",
-		},
-		{
-			_id: "697ece1a18bd6b6fdff97e99",
-			bookId: {
-				_id: "667ece1a18bd6b6fdff97ebd",
-				name: "Software architecture",
-				price: 1232,
-				authorName: "John von nueman",
-				stock: 21,
-				description: "Hello world",
-				image: "https://res.cloudinary.com/doj7bhnz8/image/upload/v1727268575/Knowledge_Shelf/wzyd8lvaigqwekfhit1i.png",
-				imagekey: "sdfsfs/dskfsl",
-				publishedDate: "2024-06-28T14:52:10.765+00:00",
-				addedBy: "667ece1a18bd6b6fdff97ebd",
-				createdAt: "2024-06-28T14:52:10.765+00:00",
-			},
-			orderName: "Mahin",
-			quantity: 2,
-			total: 12,
-			phoneNumber: "013932874378",
-			address: "savar",
-			tranxId: "ksfjksekjsdfjkjfksljf",
-		},
-		{
-			_id: "697ece1a18bd6b6fdff97e99",
-			bookId: {
-				_id: "667ece1a18bd6b6fdff97ebd",
-				name: "Software architecture",
-				price: 1232,
-				authorName: "John von nueman",
-				stock: 21,
-				description: "Hello world",
-				image: "https://res.cloudinary.com/doj7bhnz8/image/upload/v1727268575/Knowledge_Shelf/wzyd8lvaigqwekfhit1i.png",
-				imagekey: "sdfsfs/dskfsl",
-				publishedDate: "2024-06-28T14:52:10.765+00:00",
-				addedBy: "667ece1a18bd6b6fdff97ebd",
-				createdAt: "2024-06-28T14:52:10.765+00:00",
-			},
-			orderName: "Mahin",
-			quantity: 2,
-			total: 12,
-			phoneNumber: "013932874378",
-			address: "savar",
-			tranxId: "ksfjksekjsdfjkjfksljf",
-		},
-	],
-};
-
-export default function ProfilePage() {
-	const { user, history } = profileData;
+export default async function ProfilePage() {
+	const { user, history } = await getProfile();
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -161,44 +40,57 @@ export default function ProfilePage() {
 						<CardTitle>Order History</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<ScrollArea className="h-[350px] w-full rounded-md border">
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead>Book</TableHead>
-										<TableHead>Quantity</TableHead>
-										<TableHead>Total</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{history.map((order) => (
-										<TableRow key={order._id}>
-											<TableCell>
-												<div className="flex items-center space-x-3">
-													<Image
-														src={order.bookId.image}
-														alt={order.bookId.name}
-														className="rounded-sm object-cover"
-														height={40}
-														width={40}
-													/>
-													<div>
-														<div className="font-bold">
-															{order.bookId.name}
-														</div>
-														<div className="text-sm text-gray-500">
-															{order.bookId.authorName}
-														</div>
-													</div>
-												</div>
-											</TableCell>
-											<TableCell>{order.quantity}</TableCell>
-											<TableCell>${order.total.toFixed(2)}</TableCell>
+						{history.length ? (
+							<ScrollArea className="h-[350px] w-full rounded-md border">
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead>Book</TableHead>
+											<TableHead>Quantity</TableHead>
+											<TableHead>Total</TableHead>
 										</TableRow>
-									))}
-								</TableBody>
-							</Table>
-						</ScrollArea>
+									</TableHeader>
+									<TableBody>
+										<>
+											{history.map((order: IOrderHistory) => (
+												<TableRow key={order._id}>
+													<TableCell>
+														<div className="flex items-center space-x-3">
+															<Image
+																src={order.bookId.image}
+																alt={order.bookId.name}
+																className="rounded-sm object-cover"
+																height={40}
+																width={40}
+															/>
+															<div>
+																<div className="font-bold">
+																	{order.bookId.name}
+																</div>
+																<div className="text-sm text-gray-500">
+																	{order.bookId.authorName}
+																</div>
+															</div>
+														</div>
+													</TableCell>
+													<TableCell>{order.quantity}</TableCell>
+													<TableCell>${order.total.toFixed(2)}</TableCell>
+												</TableRow>
+											))}
+										</>
+									</TableBody>
+								</Table>
+							</ScrollArea>
+						) : (
+							<div className="flex items-center flex-col justify-center gap-4 h-full mt-10">
+								<p className="text-center">No order information available.</p>
+								<Link href="/books">
+									<button className="bg-blue-600 rounded-lg px-3 py-1.5 text-white">
+										Order Now
+									</button>
+								</Link>
+							</div>
+						)}
 					</CardContent>
 				</Card>
 			</div>

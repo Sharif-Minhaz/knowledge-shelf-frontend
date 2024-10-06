@@ -123,16 +123,16 @@ export const getProfile = async () => {
 
 	if (!accessToken?.value) return redirect("/login");
 
-	const res = await fetch(`${secret.baseUrl}/profile`, {
+	const res = await fetch(`${secret.baseUrl}/auth/profile`, {
 		method: "GET",
 		headers: {
 			Authorization: `Bearer ${accessToken.value}`,
 			"Content-Type": "application/json",
 		},
 	});
-	const bookInfo = await res.json();
+	const profileInfo = await res.json();
 
-	return convertToPlainObject(bookInfo);
+	return convertToPlainObject(profileInfo);
 };
 
 export const setAuthCookies = async ({

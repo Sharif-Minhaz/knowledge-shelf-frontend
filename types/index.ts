@@ -56,7 +56,7 @@ export interface ILoginRes extends TUser {
 	refreshToken: string;
 }
 
-interface IOrderHistory {
+export interface IOrderHistory {
 	_id: string;
 	bookId: TBook;
 	orderName: string;
