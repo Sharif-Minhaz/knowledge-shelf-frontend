@@ -4,6 +4,7 @@ import { PUBLIC_ROUTES, LOGIN, SIGNIN, ROOT, ADMIN_ROUTES } from "@/lib/routes";
 import { currentUser, refreshTokenFunc } from "./lib/actions/auth.actions";
 import { TUser } from "../types";
 import { cookies } from "next/headers";
+import { secret } from "./config";
 
 export async function middleware(request: NextRequest) {
 	const { nextUrl } = request;
@@ -16,9 +17,8 @@ export async function middleware(request: NextRequest) {
 	let accessTokenValue: string = accessTokenCookie?.value as string;
 	let refreshTokenValue: string = refreshTokenCookie?.value as string;
 
-	if (!accessTokenCookie?.value && !refreshTokenCookie?.value) return null;
-
 	if (refreshTokenCookie?.value && !accessTokenCookie?.value) {
+		console.log(refreshTokenCookie);
 		const newTokens = await refreshTokenFunc(refreshTokenValue);
 
 		accessTokenValue = newTokens.accessToken;
@@ -28,17 +28,17 @@ export async function middleware(request: NextRequest) {
 			httpOnly: true,
 			path: "/",
 			expires: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
-			sameSite: "lax",
+			sameSite: secret.environment === "development" ? "lax" : "none",
 		});
 		finalResponse.cookies.set("refreshToken", refreshTokenValue, {
 			httpOnly: true,
 			path: "/",
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-			sameSite: "lax",
+			secure: secret.environment === "development" ? false : true,
 		});
 	}
 
-	const user = await currentUser(); // this should trigger the cookies which will be set
+	const user = await currentUser(accessTokenValue);
 
 	const isAuthenticated = !!user;
 	const isAdmin = (user as TUser)?.role === "admin";

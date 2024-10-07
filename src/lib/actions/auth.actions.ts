@@ -8,10 +8,10 @@ import { secret } from "@/config";
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 
-export const currentUser = async () => {
+export const currentUser = async (accessTokenValue?: string) => {
 	const cookieStore = cookies();
 	const accessTokenCookie = cookieStore.get("accessToken");
-	const value = accessTokenCookie?.value;
+	const value = accessTokenCookie?.value || accessTokenValue;
 
 	if (!value) {
 		return null;
@@ -81,7 +81,7 @@ export const refreshTokenFunc = async (refreshToken: string) => {
 
 	const tokens = await res.json();
 	if (!tokens.success) {
-		throw Error(tokens.message);
+		throw Error(tokens.message); // Access token is missing error
 	}
 
 	return {
@@ -120,12 +120,14 @@ export const setAuthCookies = async ({
 		httpOnly: true,
 		path: "/",
 		expires: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
-		sameSite: "lax",
+		sameSite: secret.environment === "development" ? "lax" : "none",
+		secure: secret.environment === "development" ? false : true,
 	});
 	cookieStore.set("refreshToken", refreshToken, {
 		httpOnly: true,
 		path: "/",
 		expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-		sameSite: "lax",
+		sameSite: secret.environment === "development" ? "lax" : "none",
+		secure: secret.environment === "development" ? false : true,
 	});
 };
