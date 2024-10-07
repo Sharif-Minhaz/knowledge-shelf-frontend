@@ -78,7 +78,7 @@ export default function RegisterForm() {
 				);
 			}
 		} catch (error: unknown) {
-			console.log(error);
+			console.error(error);
 			if (error instanceof Error) {
 				toast.error(error.message);
 			} else {

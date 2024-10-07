@@ -7,46 +7,17 @@ import { convertToPlainObject } from "../utils";
 import { secret } from "@/config";
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/navigation";
 
 export const currentUser = async () => {
 	const cookieStore = cookies();
 	const accessTokenCookie = cookieStore.get("accessToken");
-	const refreshTokenCookie = cookieStore.get("refreshToken");
+	const value = accessTokenCookie?.value;
 
-	let accessTokenValue: string = accessTokenCookie?.value as string;
-
-	if (!accessTokenCookie?.value && !refreshTokenCookie?.value) return null;
-
-	if (refreshTokenCookie?.value && !accessTokenCookie?.value) {
-		console.log(
-			"===================== Cookies should save on the browser as it's in the try-catch block"
-		);
-		try {
-			const host = secret.publicUrl;
-			const res = await fetch(`${host}/api/refresh-token`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify(refreshTokenCookie?.value),
-			});
-			console.log(res);
-			const tokensInfo = await res.json();
-			console.log("Api response: ", tokensInfo);
-			accessTokenValue = tokensInfo.accessToken;
-		} catch (error) {
-			console.log("<--------------------Error occurred: ", error);
-		}
+	if (!value) {
+		return null;
 	}
 
-	if (!accessTokenValue) throw Error("Can't set the tokens in cookies");
-
-	console.log("Access token value", accessTokenValue);
-
-	const decoded = jwtDecode(accessTokenValue);
-
+	const decoded = jwtDecode(value);
 	return decoded;
 };
 
@@ -94,22 +65,24 @@ export const register = async (data: TRegistrationParams) => {
 
 		return convertToPlainObject(userInfo);
 	} catch (error: unknown) {
-		console.log(error);
+		console.error(error);
 		handleError(error, 500);
 	}
 };
 
-export const refreshTokenFunc = async (value: string) => {
+export const refreshTokenFunc = async (refreshToken: string) => {
 	const res = await fetch(`${secret.baseUrl}/auth/refresh-token`, {
 		method: "POST",
-		body: JSON.stringify({ refreshToken: value }),
+		body: JSON.stringify({ refreshToken }),
 		headers: {
 			"Content-Type": "application/json",
 		},
 	});
 
 	const tokens = await res.json();
-	setAuthCookies({ accessToken: tokens.accessToken, refreshToken: tokens.refreshToken });
+	if (!tokens.success) {
+		throw Error(tokens.message);
+	}
 
 	return {
 		refreshToken: tokens.refreshToken as string,
@@ -121,7 +94,7 @@ export const getProfile = async () => {
 	const cookieStore = cookies();
 	const accessToken = cookieStore.get("accessToken");
 
-	if (!accessToken?.value) return redirect("/login");
+	if (!accessToken?.value) throw Error("Access token not found in the cookies");
 
 	const res = await fetch(`${secret.baseUrl}/auth/profile`, {
 		method: "GET",
