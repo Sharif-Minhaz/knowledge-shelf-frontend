@@ -18,7 +18,6 @@ export async function middleware(request: NextRequest) {
 	let refreshTokenValue: string = refreshTokenCookie?.value as string;
 
 	if (refreshTokenCookie?.value && !accessTokenCookie?.value) {
-		console.log(refreshTokenCookie);
 		const newTokens = await refreshTokenFunc(refreshTokenValue);
 
 		accessTokenValue = newTokens.accessToken;
@@ -29,12 +28,14 @@ export async function middleware(request: NextRequest) {
 			path: "/",
 			expires: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
 			sameSite: secret.environment === "development" ? "lax" : "none",
+			secure: secret.environment === "development" ? false : true,
 		});
 		finalResponse.cookies.set("refreshToken", refreshTokenValue, {
 			httpOnly: true,
 			path: "/",
 			expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
 			secure: secret.environment === "development" ? false : true,
+			sameSite: secret.environment === "development" ? "lax" : "none",
 		});
 	}
 
