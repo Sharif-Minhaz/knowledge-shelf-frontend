@@ -13,8 +13,15 @@ import {
 import ProfileButton from "./ProfileButton";
 import { TUser } from "../../../types";
 import { JwtPayload } from "jwt-decode";
+import { useRouter } from "next/navigation";
 
 export default function Navbar({ userInfo }: { userInfo: TUser | JwtPayload | null | undefined }) {
+	const router = useRouter();
+	
+	const refreshRoute = () => {
+		router.refresh();
+	};
+
 	return (
 		<header className="border-b bg-slate-50 fixed top-0 w-full shadow-sm z-50">
 			<div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -28,13 +35,21 @@ export default function Navbar({ userInfo }: { userInfo: TUser | JwtPayload | nu
 					<NavigationMenu className="!ml-6">
 						<NavigationMenuList>
 							<NavigationMenuItem>
-								<Link href="/" className={navigationMenuTriggerStyle()}>
+								<Link
+									onClick={refreshRoute}
+									href="/"
+									className={navigationMenuTriggerStyle()}
+								>
 									<Home className="mr-2 h-4 w-4" />
 									Home
 								</Link>
 							</NavigationMenuItem>
 							<NavigationMenuItem className="!ml-3">
-								<Link href="/books" className={navigationMenuTriggerStyle()}>
+								<Link
+									onClick={refreshRoute}
+									href="/books"
+									className={navigationMenuTriggerStyle()}
+								>
 									<Book className="mr-2 h-4 w-4" />
 									Books
 								</Link>
