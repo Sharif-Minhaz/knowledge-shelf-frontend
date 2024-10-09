@@ -48,11 +48,11 @@ export default async function Books() {
 				</Card>
 			))}
 			{(userInfo as TUser)?.role === "admin" && (
-				<Link href="/books/add">
-					<div className="w-[60px] h-[60px] bg-blue-500 flex items-center justify-center text-white rounded-full fixed bottom-4 right-4">
+				<div className="w-[60px] h-[60px] bg-blue-500 flex items-center justify-center text-white rounded-full fixed bottom-4 right-4">
+					<Link href="/books/add">
 						<Plus />
-					</div>
-				</Link>
+					</Link>
+				</div>
 			)}
 		</div>
 	);
