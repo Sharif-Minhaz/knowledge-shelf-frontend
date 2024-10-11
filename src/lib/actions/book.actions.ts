@@ -3,11 +3,12 @@
 import { secret } from "@/config";
 import { handleError } from "../throwError";
 import { convertToPlainObject } from "../utils";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_noStore } from "next/cache";
 
 export const getAllBooks = async () => {
+	unstable_noStore();
 	try {
-		const res = await fetch(`${secret.baseUrl}/book`, { next: { revalidate: 50 } });
+		const res = await fetch(`${secret.baseUrl}/book`);
 		const booksInfo = await res.json();
 
 		return convertToPlainObject(booksInfo);
